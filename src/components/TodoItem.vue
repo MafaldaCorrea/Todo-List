@@ -26,7 +26,7 @@
       type="button"
       class="btn-close float-end"
       aria-label="Close"
-      @click="removeTodo(index)"
+      @click="removeTodo(todoCopy.id)"
     ></button>
   </li>
 </template>
@@ -41,9 +41,6 @@ export default {
     index: {
       type: Number,
     },
-    checkAll: {
-      type: Boolean,
-    },
   },
   data() {
     return {
@@ -57,8 +54,9 @@ export default {
     },
   },
   methods: {
-    removeTodo(index) {
-      this.$emit("removedTodo", index);
+    removeTodo(id) {
+      const index = this.$store.state.todos.findIndex((item) => item.id == id);
+      this.$store.commit("removeTodo", index);
     },
     editTodo(event) {
       this.todoCopy.editing = true;
@@ -66,13 +64,22 @@ export default {
       setTimeout(() => event.target.nextElementSibling.focus(), 50);
     },
     doneEdit() {
-      if (!this.todoCopy.title.trim()) this.removeTodo(this.index);
+      if (!this.todoCopy.title.trim()) this.removeTodo(this.todoCopy.id);
       this.todoCopy.editing = false;
-      this.$emit("finishedEdit", { index: this.index, todo: this.todoCopy });
+
+      const index = this.$store.state.todos.findIndex(
+        (item) => item.id == this.todoCopy.id
+      );
+      this.$store.commit("updateTodo", { index: index, todo: this.todoCopy });
     },
     cancelEdit() {
       this.todoCopy.title = this.beforeEdit;
-      this.doneEdit(this.todoCopy);
+      this.doneEdit();
+    },
+  },
+  computed: {
+    checkAll() {
+      return !this.$store.getters.anyRemainingItems;
     },
   },
 };
