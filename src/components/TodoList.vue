@@ -9,39 +9,15 @@
     />
   </div>
   <ul class="list-group mt-3">
-    <li
-      class="list-group-item list-group-item-action"
+    <todo-item
       v-for="(todo, index) in todoList"
       :key="todo.id"
-    >
-      <input
-        class="form-check-input me-1"
-        type="checkbox"
-        v-model="todo.completed"
-      />
-      <label
-        v-show="!todo.editing"
-        :class="{ 'text-decoration-line-through': todo.completed }"
-        @dblclick="editTodo($event, todo)"
-      >
-        {{ todo.title }}
-      </label>
-      <input
-        type="text"
-        class="border-0"
-        v-show="todo.editing"
-        v-model="todo.title"
-        @blur="stopEditingTodo(todo)"
-        @keyup.enter="stopEditingTodo(todo)"
-        @keyup.esc="cancelEdit(todo)"
-      />
-      <button
-        type="button"
-        class="btn-close float-end"
-        aria-label="Close"
-        @click="removeTodo(index)"
-      ></button>
-    </li>
+      :todo="todo"
+      :index="index"
+      :checkAll="!anyRemainingItems"
+      @removedTodo="removeTodo"
+      @finishedEdit="finishedEdit"
+    ></todo-item>
   </ul>
   <div class="mt-3 pb-3 clearfix border-bottom">
     <div class="float-start">
@@ -93,12 +69,16 @@
 </template>
 
 <script>
+import TodoItem from "./TodoItem.vue";
+
 export default {
   name: "todo-list",
+  components: {
+    TodoItem,
+  },
   data() {
     return {
       newTodo: "",
-      beforeEdit: "",
       todoId: 3,
       filter: "all",
       todos: [
@@ -138,18 +118,8 @@ export default {
     removeTodo(index) {
       this.todos.splice(index, 1);
     },
-    editTodo(event, todo) {
-      todo.editing = true;
-      this.beforeEdit = todo.title;
-      setTimeout(() => event.target.nextElementSibling.focus(), 50);
-    },
-    stopEditingTodo(todo) {
-      if (!todo.title.trim()) this.removeTodo(todo.index);
-      todo.editing = false;
-    },
-    cancelEdit(todo) {
-      todo.title = this.beforeEdit;
-      this.stopEditingTodo(todo);
+    finishedEdit(data) {
+      this.todos.splice(data.index, 1, data.todo);
     },
     checkAllTodos() {
       this.todos.map((m) => (m.completed = event.target.checked));

@@ -1,24 +1,22 @@
 <template>
   <div class="container col-lg-5">
-    <img alt="Vue logo" class="logo" src="./assets/logo.png">
+    <img alt="Vue logo" class="logo" src="./assets/logo.png" />
     <TodoList />
-
   </div>
 </template>
 
 <script>
-import TodoList from './components/TodoList.vue'
+import TodoList from "./components/TodoList.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    TodoList
-  }
-}
+    TodoList,
+  },
+};
 </script>
 
 <style>
-
 * {
   box-sizing: border-box;
 }
